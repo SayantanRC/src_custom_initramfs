@@ -91,6 +91,7 @@ module_source_path="/lib/modules/`uname -r`"
 init_mod_dir_name="nokernel"
 
 mods=(ext4 ntfs loop)
+
 for mod in ${mods[@]}; do
   while read -r actual_mod_path
   do
@@ -114,3 +115,80 @@ but not something like
 
 etc.  
 The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko</pre>
+
+## Finally create the init script
+Create a file named as `init` in the root of the initramfs, i.e. at `~/src_custom_initramfs/init`  
+How to write an init script can be found in various online resources. A template is given in this repository, feel free to use it.
+
+## Specific use case - booting an img file.
+The expected menuentry is (can be set under `/etc/grub.d/40_custom`):
+```
+menuentry "Arch IMG" {
+        img_part=/dev/sda7
+        img_path=/arch.img
+        search --no-floppy --set=root --file $img_path
+        loopback loop $img_path
+        linux (loop)/boot/vmlinuz-linux img_part=$img_part img_path=$img_path
+        initrd (loop)/boot/my_initramfs.igz
+}
+```
+Here we will use the commandline arguments to set the root as the image because GRUB cannot directly boot from an img file.  
+The `init` script will look like this:  
+```
+#!/usr/bin/bash
+
+mount -t devtmpfs  devtmpfs  /dev
+mount -t proc      proc      /proc
+mount -t sysfs     sysfs     /sys
+mount -t tmpfs     tmpfs     /tmp
+
+# ext4 and its dependencies
+insmod /lib/modules/nokernel/kernel/fs/jbd2/jbd2.ko
+insmod /lib/modules/nokernel/kernel/fs/mbcache.ko
+insmod /lib/modules/nokernel/kernel/lib/crc16.ko
+insmod /lib/modules/nokernel/kernel/arch/x86/crypto/crc32c-intel.ko
+insmod /lib/modules/nokernel/kernel/crypto/crc32c_generic.ko
+insmod /lib/modules/nokernel/kernel/fs/ext4/ext4.ko
+
+# ntfs
+insmod /lib/modules/nokernel/kernel/fs/ntfs/ntfs.ko
+
+# commandline arguments
+args=$(cat /proc/cmdline)
+
+# do your thing here, finally mount the boot location to /mnt/root
+
+arg_part=$(echo $args | awk '{print $1}')
+arg_path=$(echo $args | awk '{print $2}')
+
+img_part=$(echo $arg_part | cut -d '=' -f2)
+img_path=$(echo $arg_path | cut -d '=' -f2)
+
+mkdir /img_partition
+mount -o rw $img_part /img_partition
+
+mount -o rw,loop,sync /img_partition/$img_path /mnt/root
+
+
+
+
+# clean up
+umount /proc
+umount /sys
+
+# Boot
+exec switch_root /mnt/root /sbin/init
+```
+
+#### Important
+In the above scenario, some more modifications are to be done before booting.  
+1. The img file needs to be mounted as read-write and the `etc/fstab` entries need to be changed. UUID of the / partition must be same as the UUID of the actual img file. This can be found by the command `blkid <path_to_arch.img_file>`  
+2. Also in most cases, the modules from the current distro will not work on this `arch.img` file. The img file needs to be mounted, and in the [AUTOMATION section of "Gathering modprobe modules"](#automation-2), the variable `module_source_path` needs to point to the modules of this img mount point (say "/run/media/$USER/arch_root/lib/modules/5.9.6/")
+
+## Compile the initramfs
+The compiled output should not reside inside the initramfs directory.
+```
+find . | cpio -H newc -o > ../my_initramfs.cpio
+cat ../my_initramfs.cpio | gzip > ../my_initramfs.igz
+```
+Now this `my_initramfs.igz` file can be placed in the target device's boot directory and called from `initrd` of Grub.

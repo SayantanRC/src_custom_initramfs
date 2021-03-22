@@ -6,20 +6,20 @@ mount -t sysfs     sysfs     /sys
 mount -t tmpfs     tmpfs     /tmp
 
 # ext4 and its dependencies
-insmod /lib/modules/`uname -r`/kernel/fs/jbd2/jbd2.ko
-insmod /lib/modules/`uname -r`/kernel/fs/mbcache.ko
-insmod /lib/modules/`uname -r`/kernel/lib/crc16.ko
-insmod /lib/modules/`uname -r`/kernel/arch/x86/crypto/crc32c-intel.ko
-insmod /lib/modules/`uname -r`/kernel/crypto/crc32c_generic.ko
-insmod /lib/modules/`uname -r`/kernel/fs/ext4/ext4.ko
+insmod /lib/modules/nokernel/kernel/fs/jbd2/jbd2.ko
+insmod /lib/modules/nokernel/kernel/fs/mbcache.ko
+insmod /lib/modules/nokernel/kernel/lib/crc16.ko
+insmod /lib/modules/nokernel/kernel/arch/x86/crypto/crc32c-intel.ko
+insmod /lib/modules/nokernel/kernel/crypto/crc32c_generic.ko
+insmod /lib/modules/nokernel/kernel/fs/ext4/ext4.ko
 
 # ntfs
-insmod /lib/modules/`uname -r`/kernel/fs/ntfs/ntfs.ko
+insmod /lib/modules/nokernel/kernel/fs/ntfs/ntfs.ko
 
 # commandline arguments
 args=$(cat /proc/cmdline)
 
-# do your thing here, finally boot to /mnt/root
+# do your thing here, finally mount the boot location to /mnt/root
 
 
 
@@ -27,6 +27,12 @@ args=$(cat /proc/cmdline)
 
 
 
+
+
+
+# clean up
+umount /proc
+umount /sys
 
 # Boot
 exec switch_root /mnt/root /sbin/init
