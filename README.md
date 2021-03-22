@@ -27,3 +27,5 @@ do
   cp -v $bin_path $init_bin_path
 done < <(which {mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
 ```
+
+## Gathering dynamic dependencies
