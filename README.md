@@ -1,5 +1,5 @@
 ## Setup directories
-Clone this repository in your home directory and move to [Gathering binaries](#gathering-binaries). Or follow the below steps to manually setup the directory structure.  
+Clone this repository in the home directory and move to [Gathering binaries](#gathering-binaries). Or follow the below steps to manually setup the directory structure.  
 To manually create the directories: Use the below commands.  
 ```
 mkdir ~/src_custom_initramfs
@@ -14,7 +14,7 @@ ln -s usr/lib64 .
 ```
 
 ## Gathering binaries
-The following binaries are recommended to be added. You may add more (or less) depending on your needs.  
+The following binaries are recommended to be added. More (or less) binaries may be added as per requirement.  
 `bash, mkdir, ls, tail, grep, cut, awk, mount, umount, insmod, lsmod, modprobe, switch_root`  
 To find the location of the binary, in terminal, type `type <binary-name>` or `which <binary-name>`. Example: `which modprobe` gives output `/usr/bin/modprobe`  
 We need to copy each of them in the respective directories. In the above example of modprobe, the command would be `cp -p /usr/bin/modprobe usr/bin/modprobe`.  
@@ -57,13 +57,13 @@ do
     lib_path=$(echo $dependency | cut -d ' ' -f3)
     init_lib_path=${lib_path:1}
     cp -npv $lib_path $init_lib_path
-    # -n flag: no-clobber - do NOT overwrite an existing file
   done < <(ldd $bin_path | tail -n +2)
 done < <(which {bash,mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root})
 ```
+The -n flag in `cp`: no-clobber - do NOT overwrite an existing file.
 
 ## Check if `chroot` works
-At this point you should be able to chroot into you initramfs directory.
+At this point we should be able to chroot into our initramfs directory.
 ```
 cd ~/src_custom_initramfs
 
@@ -72,7 +72,7 @@ sudo chroot . usr/bin/bash
 
 ## Gathering modprobe modules
 We will add the following modprobe modules along with their dependencies.  
-`ext4, ntfs, loop`
+`ext4, ntfs, loop`  
 Module files and their dependencies can be seen via the command `modprobe --show-depends <module-name>`. For example, `modprobe --show-depends ext4` gives result:
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/mbcache.ko.xz  
@@ -80,4 +80,24 @@ Module files and their dependencies can be seen via the command `modprobe --show
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/arch/x86/crypto/crc32c-intel.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/crypto/crc32c_generic.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/ext4/ext4.ko.xz  
+If we want to make an initramfs for this kernel, we can go ahead and copy these files. Syntax will be something like `mkdir -p lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2; cp -pv lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2 lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2` for each of the modules.  
+If however, we need to get the modules for a different kernel, we will need to copy from that kernel modules (various cases arise here like copying from an OS on a USB, copying from a backup img file etc).  
+### AUTOMATION!
+```
+cd ~/src_custom_initramfs
 
+module_source_path="/lib/modules/`uname -r`"
+init_mod_dir_name="`uname -r`"
+
+mods=(ext4 ntfs loop)
+for mod in ${mods[@]}; do
+  while read -r actual_mod_path
+  do
+    useful_path=$(echo $actual_mod_path | cut -d '/' -f5-)
+    init_mod_dir="lib/modules/$init_mod_dir_name/$(echo ${useful_path%/*})"
+    init_mod_file=$(echo ${useful_path##*/})
+    mkdir -p $init_mod_dir
+    cp -pv $module_source_path/$useful_path $init_mod_dir/$init_mod_file
+  done < <(modprobe --show-depends $mod | cut -d ' ' -f2)
+done
+```
