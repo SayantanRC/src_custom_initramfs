@@ -18,7 +18,7 @@ The following binaries are recommended to be added. You may add more (or less) d
 `mkdir, ls, tail, grep, cut, awk, mount, umount, insmod, modprobe, switch_root`  
 To find the location of the binary, in terminal, type `type <binary-name>` or `which <binary-name>`. Example: `which modprobe` gives output `/usr/bin/modprobe`  
 We need to copy each of them in the respective directories. In the above example of modprobe, the command would be `cp -p /usr/bin/modprobe usr/bin/modprobe`.  
-<b>AUTOMATION!</b>  
+### AUTOMATION!
 ```
 cd ~/src_custom_initramfs
 while read -r bin_path
