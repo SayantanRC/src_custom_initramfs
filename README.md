@@ -15,7 +15,7 @@ ln -s usr/lib64 .
 
 ## Gathering binaries
 The following binaries are recommended to be added. You may add more (or less) depending on your needs.  
-`bash, mkdir, ls, tail, grep, cut, awk, mount, umount, insmod, modprobe, switch_root`  
+`bash, mkdir, ls, tail, grep, cut, awk, mount, umount, insmod, lsmod, modprobe, switch_root`  
 To find the location of the binary, in terminal, type `type <binary-name>` or `which <binary-name>`. Example: `which modprobe` gives output `/usr/bin/modprobe`  
 We need to copy each of them in the respective directories. In the above example of modprobe, the command would be `cp -p /usr/bin/modprobe usr/bin/modprobe`.  
 ### AUTOMATION!
@@ -26,7 +26,7 @@ while read -r bin_path
 do
   init_bin_path=${bin_path:1}
   cp -pv $bin_path $init_bin_path
-done < <(which {bash,mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
+done < <(which {bash,mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root})
 ```
 
 ## Gathering library dependencies
@@ -56,7 +56,28 @@ do
   do
     lib_path=$(echo $dependency | cut -d ' ' -f3)
     init_lib_path=${lib_path:1}
-    cp -pv $lib_path $init_lib_path
+    cp -npv $lib_path $init_lib_path
+    # -n flag: no-clobber - do NOT overwrite an existing file
   done < <(ldd $bin_path | tail -n +2)
-done < <(which {bash,mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
+done < <(which {bash,mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root})
 ```
+
+## Check if `chroot` works
+At this point you should be able to chroot into you initramfs directory.
+```
+cd ~/src_custom_initramfs
+
+sudo chroot . usr/bin/bash
+```
+
+## Gathering modprobe modules
+We will add the following modprobe modules along with their dependencies.  
+`ext4, ntfs, loop`
+Module files and their dependencies can be seen via the command `modprobe --show-depends <module-name>`. For example, `modprobe --show-depends ext4` gives result:
+> insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz  
+> insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/mbcache.ko.xz  
+> insmod /lib/modules/5.11.6-1-MANJARO/kernel/lib/crc16.ko.xz  
+> insmod /lib/modules/5.11.6-1-MANJARO/kernel/arch/x86/crypto/crc32c-intel.ko.xz  
+> insmod /lib/modules/5.11.6-1-MANJARO/kernel/crypto/crc32c_generic.ko.xz  
+> insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/ext4/ext4.ko.xz  
+
