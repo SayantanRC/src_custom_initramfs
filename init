@@ -1,0 +1,32 @@
+#!/usr/bin/bash
+
+mount -t devtmpfs  devtmpfs  /dev
+mount -t proc      proc      /proc
+mount -t sysfs     sysfs     /sys
+mount -t tmpfs     tmpfs     /tmp
+
+# ext4 and its dependencies
+insmod /lib/modules/`uname -r`/kernel/fs/jbd2/jbd2.ko
+insmod /lib/modules/`uname -r`/kernel/fs/mbcache.ko
+insmod /lib/modules/`uname -r`/kernel/lib/crc16.ko
+insmod /lib/modules/`uname -r`/kernel/arch/x86/crypto/crc32c-intel.ko
+insmod /lib/modules/`uname -r`/kernel/crypto/crc32c_generic.ko
+insmod /lib/modules/`uname -r`/kernel/fs/ext4/ext4.ko
+
+# ntfs
+insmod /lib/modules/`uname -r`/kernel/fs/ntfs/ntfs.ko
+
+# commandline arguments
+args=$(cat /proc/cmdline)
+
+# do your thing here, finally boot to /mnt/root
+
+
+
+
+
+
+
+
+# Boot
+exec switch_root /mnt/root /sbin/init
