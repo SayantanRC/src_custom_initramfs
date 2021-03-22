@@ -80,6 +80,7 @@ Module files and their dependencies can be seen via the command `modprobe --show
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/arch/x86/crypto/crc32c-intel.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/crypto/crc32c_generic.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/ext4/ext4.ko.xz  
+
 If we want to make an initramfs for this kernel, we can go ahead and copy these files. Syntax will be something like `mkdir -p lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2; cp -pv lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2 lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2` for each of the modules.  
 If however, we need to get the modules for a different kernel, we will need to copy from that kernel modules (various cases arise here like copying from an OS on a USB, copying from a backup img file etc).  
 ### AUTOMATION!
