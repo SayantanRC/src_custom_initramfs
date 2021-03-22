@@ -15,7 +15,7 @@ ln -s usr/lib64 .
 
 ## Gathering binaries
 The following binaries are recommended to be added. You may add more (or less) depending on your needs.  
-`mkdir, ls, tail, grep, cut, awk, mount, umount, insmod, modprobe, switch_root`  
+`bash, mkdir, ls, tail, grep, cut, awk, mount, umount, insmod, modprobe, switch_root`  
 To find the location of the binary, in terminal, type `type <binary-name>` or `which <binary-name>`. Example: `which modprobe` gives output `/usr/bin/modprobe`  
 We need to copy each of them in the respective directories. In the above example of modprobe, the command would be `cp -p /usr/bin/modprobe usr/bin/modprobe`.  
 ### AUTOMATION!
@@ -26,7 +26,7 @@ while read -r bin_path
 do
   init_bin_path=${bin_path:1}
   cp -pv $bin_path $init_bin_path
-done < <(which {mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
+done < <(which {bash,mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
 ```
 
 ## Gathering library dependencies
@@ -58,5 +58,5 @@ do
     init_lib_path=${lib_path:1}
     cp -pv $lib_path $init_lib_path
   done < <(ldd $bin_path | tail -n +2)
-done < <(which {mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
+done < <(which {bash,mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
 ```
