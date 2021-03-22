@@ -29,19 +29,19 @@ do
 done < <(which {mkdir,ls,tail,grep,cut,awk,mount,umount,insmod,modprobe,switch_root})
 ```
 
-## Gathering dynamic dependencies
+## Gathering library dependencies
 Each of the above binaries have one or several library dependencies. Example:  
 `ldd /usr/bin/modprobe` gives output:  
 
->	linux-vdso.so.1 (0x00007ffee9f24000)
->	libzstd.so.1 => /usr/lib/libzstd.so.1 (0x00007f947c7d4000)
->	liblzma.so.5 => /usr/lib/liblzma.so.5 (0x00007f947c7ac000)
->	libz.so.1 => /usr/lib/libz.so.1 (0x00007f947c792000)
->	libcrypto.so.1.1 => /usr/lib/libcrypto.so.1.1 (0x00007f947c4b4000)
->	libc.so.6 => /usr/lib/libc.so.6 (0x00007f947c2e7000)
->	libpthread.so.0 => /usr/lib/libpthread.so.0 (0x00007f947c2c6000)
->	libdl.so.2 => /usr/lib/libdl.so.2 (0x00007f947c2bd000)
->	/lib64/ld-linux-x86-64.so.2 => /usr/lib64/ld-linux-x86-64.so.2 (0x00007f947c8f7000)
+>	linux-vdso.so.1 (0x00007ffee9f24000)  
+>	libzstd.so.1 => /usr/lib/libzstd.so.1 (0x00007f947c7d4000)  
+>	liblzma.so.5 => /usr/lib/liblzma.so.5 (0x00007f947c7ac000)  
+>	libz.so.1 => /usr/lib/libz.so.1 (0x00007f947c792000)  
+>	libcrypto.so.1.1 => /usr/lib/libcrypto.so.1.1 (0x00007f947c4b4000)  
+>	libc.so.6 => /usr/lib/libc.so.6 (0x00007f947c2e7000)  
+>	libpthread.so.0 => /usr/lib/libpthread.so.0 (0x00007f947c2c6000)  
+>	libdl.so.2 => /usr/lib/libdl.so.2 (0x00007f947c2bd000)  
+>	/lib64/ld-linux-x86-64.so.2 => /usr/lib64/ld-linux-x86-64.so.2 (0x00007f947c8f7000)  
 
 All these dependencies are to be added individually for all the binaries. Example
 `cp -p /usr/lib/libzstd.so.1 usr/lib/libzstd.so.1` and so on.  
