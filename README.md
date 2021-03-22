@@ -87,7 +87,7 @@ If however, we need to get the modules for a different kernel, we will need to c
 cd ~/src_custom_initramfs
 
 module_source_path="/lib/modules/`uname -r`"
-init_mod_dir_name="`uname -r`"
+init_mod_dir_name="nokernel"
 
 mods=(ext4 ntfs loop)
 for mod in ${mods[@]}; do
@@ -101,3 +101,12 @@ for mod in ${mods[@]}; do
   done < <(modprobe --show-depends $mod | cut -d ' ' -f2)
 done
 ```
+The variable `module_source_path` can refer to a custom location, just above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
+> "/lib/modules/5.4"  
+> "/lib/modules/5.11"  
+but not something like  
+> "/lib/modules"  
+> "/lib/modules/5.11/kernel"  
+> "/lib/modules/5.4/build"  
+etc.  
+The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko</pre>
