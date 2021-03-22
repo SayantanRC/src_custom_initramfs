@@ -13,7 +13,7 @@ ln -s usr/lib .
 ln -s usr/lib64 .
 ```
 
-## Gather binaries
+## Gathering binaries
 The following binaries are recommended to be added. You may add more (or less) depending on your needs.  
 `mkdir, ls, tail, grep, cut, awk, mount, umount, insmod, modprobe, switch_root`  
 To find the location of the binary, in terminal, type `type <binary-name>` or `which <binary-name>`. Example: `which modprobe` gives output `/usr/bin/modprobe`  
