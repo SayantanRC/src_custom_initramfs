@@ -88,7 +88,7 @@ If however, we need to get the modules for a different kernel, we will need to c
 cd ~/src_custom_initramfs
 
 module_source_path="/lib/modules/`uname -r`"
-init_mod_dir_name="nokernel"
+init_mod_dir_name="generic"
 
 mods=(ext4 ntfs loop)
 
@@ -143,15 +143,16 @@ mount -t sysfs     sysfs     /sys
 mount -t tmpfs     tmpfs     /tmp
 
 # ext4 and its dependencies
-insmod /lib/modules/nokernel/kernel/fs/jbd2/jbd2.ko
-insmod /lib/modules/nokernel/kernel/fs/mbcache.ko
-insmod /lib/modules/nokernel/kernel/lib/crc16.ko
-insmod /lib/modules/nokernel/kernel/arch/x86/crypto/crc32c-intel.ko
-insmod /lib/modules/nokernel/kernel/crypto/crc32c_generic.ko
-insmod /lib/modules/nokernel/kernel/fs/ext4/ext4.ko
+insmod /lib/modules/generic/kernel/fs/jbd2/jbd2.ko.xz
+insmod /lib/modules/generic/kernel/fs/mbcache.ko.xz
+insmod /lib/modules/generic/kernel/lib/crc16.ko.xz
+insmod /lib/modules/generic/kernel/arch/x86/crypto/crc32c-intel.ko.xz
+insmod /lib/modules/generic/kernel/crypto/crc32c_generic.ko.xz
+insmod /lib/modules/generic/kernel/fs/ext4/ext4.ko.xz
 
 # ntfs
-insmod /lib/modules/nokernel/kernel/fs/ntfs/ntfs.ko
+insmod /lib/modules/generic/kernel/fs/ntfs/ntfs.ko.xz
+insmod /lib/modules/generic/kernel/drivers/block/loop.ko.xz
 
 # commandline arguments
 args=$(cat /proc/cmdline)
