@@ -93,6 +93,7 @@ If however, we need to get the modules for a different kernel, we will need to c
 ```
 module_source_path="/lib/modules/`uname -r`"
 ```
+<b>The path specified by this variable must exist.</b>  
 The variable `module_source_path` can refer to a custom location, ending with a kernel release, just one level above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
 > "/lib/modules/5.4"  
 > "/lib/modules/5.11"  
