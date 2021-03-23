@@ -139,7 +139,7 @@ for mod in ${mods[@]}; do
       cp -npv $ko_path $init_mod_path
     elif [[ -e "$xz_path" ]]; then
       init_mod_path="${init_mod_dir}/${actual_mod_name}.ko.xz"
-      cp -npv $xz_path $init_mod_path
+      cp -np $xz_path $init_mod_path && echo "Copied: $actual_mod_name" || echo "FAILED: $actual_mod_name"
     else
       echo "Module $actual_mod_name not found in source path"
     fi
