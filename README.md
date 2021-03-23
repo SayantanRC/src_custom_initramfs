@@ -151,6 +151,23 @@ but not something like
 etc.  
 The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko</pre>
 
+## Create the `module_list.txt` file
+If the above [automation](#automation-2) is used, then this file is already created. If not, we need to manually create this file under the initramfs root.  
+```
+cd ~/src_custom_initramfs
+vim module_list.txt
+```
+Contents of the file will be something like:
+> /lib/modules/generic/kernel/fs/jbd2/jbd2.ko.xz
+> /lib/modules/generic/kernel/fs/mbcache.ko.xz
+> /lib/modules/generic/kernel/lib/crc16.ko.xz
+> /lib/modules/generic/kernel/arch/x86/crypto/crc32c-intel.ko.xz
+> /lib/modules/generic/kernel/crypto/crc32c_generic.ko.xz
+> /lib/modules/generic/kernel/fs/ext4/ext4.ko.xz
+> /lib/modules/generic/kernel/fs/ntfs/ntfs.ko.xz
+> /lib/modules/generic/kernel/drivers/block/loop.ko.xz
+
+
 ## Finally create the init script
 Create a file named as `init` in the root of the initramfs, i.e. at `~/src_custom_initramfs/init`  
 How to write an init script can be found in various online resources. A template is given in this repository, feel free to use it.
