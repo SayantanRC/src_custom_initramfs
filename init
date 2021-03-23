@@ -30,5 +30,5 @@ umount /proc
 umount /sys
 
 # Boot
-printf "\nBooting..."
+printf "\nBooting...\n\n"
 exec switch_root /mnt/root /sbin/init
