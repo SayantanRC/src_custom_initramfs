@@ -93,12 +93,12 @@ If however, we need to get the modules for a different kernel, we will need to c
 ```
 module_source_path="/lib/modules/`uname -r`"
 ```
-The variable `module_source_path` can refer to a custom location, just above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
+The variable `module_source_path` can refer to a custom location, ending with a kernel release, just one level above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
 > "/lib/modules/5.4"  
 > "/lib/modules/5.11"  
 
-It can also be set to an external source, say we have mounted a live USB, then `module_source_path` can also be set as `/run/media/<user>/arch_root/lib/modules/5.9.6-arch1-1`; where `/run/media/<user>/arch_root` is the mount point.
-This variable cannot take values like:  
+It can also be set to an external source, say we have mounted a live USB, then `module_source_path` can also be set as `/run/media/<user>/arch_root/lib/modules/5.9.6-arch1-1`; where `/run/media/<user>/arch_root` is the mount point.  
+The value must end with a kernel-release similar to ouput of `uname -r`. It cannot take values like:  
 
 > "/lib/modules"  
 > "/lib/modules/5.11/kernel"  
