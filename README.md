@@ -97,7 +97,7 @@ module_source_path="/lib/modules/`uname -r`"
 init_mod_dir_name="generic"
 
 mods=(ext4 ntfs loop)
-mod_list_file="mod_list_file.txt"
+mod_list_file="module_list.txt"
 
 cat /dev/null > $mod_list_file
 
@@ -121,10 +121,10 @@ for mod in ${mods[@]}; do
     init_mod_path=""
     if [[ -e "$ko_path" ]]; then
       init_mod_path="${init_mod_dir}/${actual_mod_name}.ko"
-      cp -pv $ko_path $init_mod_path
+      cp -npv $ko_path $init_mod_path
     elif [[ -e "$xz_path" ]]; then
       init_mod_path="${init_mod_dir}/${actual_mod_name}.ko.xz"
-      cp -pv $xz_path $init_mod_path
+      cp -npv $xz_path $init_mod_path
     else
       echo "Module $actual_mod_name not found in source path"
     fi
