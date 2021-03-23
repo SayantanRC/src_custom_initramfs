@@ -233,7 +233,12 @@ fi
 
 echo "Mounting partition..."
 mkdir /img_partition
-mount -o rw $img_part /img_partition
+if [[ "$part_type" == "ntfs" ]]; then
+  echo "Mounting with ntfs-3g..."
+  ntfs-3g $img_part /img_partition
+else
+  mount -o rw $img_part /img_partition
+fi
 
 echo "Mounting IMG as loop..."
 mount -o rw,loop,sync /img_partition/$img_path /mnt/root
