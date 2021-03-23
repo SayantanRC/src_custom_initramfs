@@ -91,9 +91,22 @@ If we want to make an initramfs for this kernel, we can go ahead and copy these 
 If however, we need to get the modules for a different kernel, we will need to copy from that kernel modules (various cases arise here like copying from an OS on a USB, copying from a backup img file etc).  
 ### AUTOMATION!
 ```
+module_source_path="/lib/modules/`uname -r`"
+```
+The variable `module_source_path` can refer to a custom location, just above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
+> "/lib/modules/5.4"  
+> "/lib/modules/5.11"  
+
+but not something like  
+
+> "/lib/modules"  
+> "/lib/modules/5.11/kernel"  
+> "/lib/modules/5.4/build"  
+
+etc.  
+```
 cd ~/src_custom_initramfs
 
-module_source_path="/lib/modules/`uname -r`"
 init_mod_dir_name="generic"
 
 mods=(ext4 ntfs loop)
@@ -138,17 +151,6 @@ done
 
 ```
 This script checks the presence of `.ko` modules and `.ko.xz` modules and copies them accordingly. It also lists the copied modules in a file named `module_list.txt`.  
-The variable `module_source_path` can refer to a custom location, just above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
-> "/lib/modules/5.4"  
-> "/lib/modules/5.11"  
-
-but not something like  
-
-> "/lib/modules"  
-> "/lib/modules/5.11/kernel"  
-> "/lib/modules/5.4/build"  
-
-etc.  
 The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko.xz</pre>  
 If we are using the `init` file from this repository as a template, along with `module_list.txt` (check the next section), then we do not need to worry about inserting the modules as it will be done for automatically.  
 
