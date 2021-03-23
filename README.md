@@ -194,17 +194,12 @@ mount -t proc      proc      /proc
 mount -t sysfs     sysfs     /sys
 mount -t tmpfs     tmpfs     /tmp
 
-# ext4 and its dependencies
-insmod /lib/modules/generic/kernel/fs/jbd2/jbd2.ko.xz
-insmod /lib/modules/generic/kernel/fs/mbcache.ko.xz
-insmod /lib/modules/generic/kernel/lib/crc16.ko.xz
-insmod /lib/modules/generic/kernel/arch/x86/crypto/crc32c-intel.ko.xz
-insmod /lib/modules/generic/kernel/crypto/crc32c_generic.ko.xz
-insmod /lib/modules/generic/kernel/fs/ext4/ext4.ko.xz
+# insert modules
+while read -r mod_path
+do
+  insmod $mod_path
+done < module_list.txt
 
-# ntfs
-insmod /lib/modules/generic/kernel/fs/ntfs/ntfs.ko.xz
-insmod /lib/modules/generic/kernel/drivers/block/loop.ko.xz
 
 # commandline arguments
 args=$(cat /proc/cmdline)
