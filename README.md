@@ -97,7 +97,8 @@ The variable `module_source_path` can refer to a custom location, just above the
 > "/lib/modules/5.4"  
 > "/lib/modules/5.11"  
 
-but not something like  
+It can also be set to an external source, say we have mounted a live USB, then `module_source_path` can also be set as `/run/media/<user>/arch_root/lib/modules/5.9.6-arch1-1`; where `/run/media/<user>/arch_root` is the mount point.
+This variable cannot take values like:  
 
 > "/lib/modules"  
 > "/lib/modules/5.11/kernel"  
