@@ -3,7 +3,7 @@
 Clone this repository in the home directory 
 ```
 cd ~
-https://github.com/SayantanRC/src_custom_initramfs.git
+git clone https://github.com/SayantanRC/src_custom_initramfs.git
 ```
 and move to [Gathering binaries](#gathering-binaries). Or follow the below steps to manually setup the directory structure.  
 #### To manually create the directories, use the below commands.  
