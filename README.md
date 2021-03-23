@@ -1,3 +1,4 @@
+# Create a custom initramfs
 ## Setup directories
 Clone this repository in the home directory 
 ```
