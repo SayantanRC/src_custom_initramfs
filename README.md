@@ -215,6 +215,7 @@ arg_path=$(echo $args | awk '{print $3}')
 img_part=$(echo $arg_part | cut -d '=' -f2)
 img_path=$(echo $arg_path | cut -d '=' -f2)
 
+echo ""
 echo "Partition: $img_part"
 echo "IMG path: $img_path"
 
@@ -224,6 +225,7 @@ printf "\nPartition type (blkid): $part_type\n\n"
 if [[ "$part_type" == "ntfs" ]]; then
   printf "Checking and fixing NTFS...\n\n"
   ntfsfix -d $img_part
+  echo ""
 fi
 
 echo "Mounting partition..."
@@ -241,7 +243,7 @@ umount /proc
 umount /sys
 
 # Boot
-printf "\nBooting..."
+printf "\nBooting...\n\n"
 exec switch_root /mnt/root /sbin/init
 ```
 
