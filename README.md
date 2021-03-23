@@ -149,7 +149,8 @@ but not something like
 > "/lib/modules/5.4/build"  
 
 etc.  
-The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko</pre>
+The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko.xz</pre>  
+If we are using the `init` file from this repository as a template, along with `module_list.txt` (check the next section), then we do not need to worry about inserting the modules as it will be done for automatically.  
 
 ## Create the `module_list.txt` file
 If the above [automation](#automation-2) is used, then this file is already created. If not, we need to manually create this file under the initramfs root.  
