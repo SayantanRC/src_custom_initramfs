@@ -97,18 +97,47 @@ module_source_path="/lib/modules/`uname -r`"
 init_mod_dir_name="generic"
 
 mods=(ext4 ntfs loop)
+mod_list_file="mod_list_file.txt"
+
+cat /dev/null > $mod_list_file
 
 for mod in ${mods[@]}; do
   while read -r actual_mod_path
   do
-    useful_path=$(echo $actual_mod_path | cut -d '/' -f5-)
-    init_mod_dir="lib/modules/$init_mod_dir_name/$(echo ${useful_path%/*})"
-    init_mod_file=$(echo ${useful_path##*/})
+  
+    after_kernel_path=$(echo $actual_mod_path | cut -d '/' -f5-)
+    after_kernel_dir=$(echo ${after_kernel_path%/*})
+    
+    actual_mod_file=$(echo ${after_kernel_path##*/})
+    actual_mod_name=$(echo ${actual_mod_file%%.*})
+    
+    init_mod_dir="lib/modules/$init_mod_dir_name/$after_kernel_dir"
+    
     mkdir -p $init_mod_dir
-    cp -pv $module_source_path/$useful_path $init_mod_dir/$init_mod_file
+    
+    ko_path="${module_source_path}/${after_kernel_dir}/${actual_mod_name}.ko"
+    xz_path="${module_source_path}/${after_kernel_dir}/${actual_mod_name}.ko.xz"
+    
+    init_mod_path=""
+    if [[ -e "$ko_path" ]]; then
+      init_mod_path="${init_mod_dir}/${actual_mod_name}.ko"
+      cp -pv $ko_path $init_mod_path
+    elif [[ -e "$xz_path" ]]; then
+      init_mod_path="${init_mod_dir}/${actual_mod_name}.ko.xz"
+      cp -pv $xz_path $init_mod_path
+    else
+      echo "Module $actual_mod_name not found in source path"
+    fi
+    
+    if [[ -n "$init_mod_path" ]]; then
+      echo "/${init_mod_path}" >> $mod_list_file
+    fi
+    
   done < <(modprobe --show-depends $mod | cut -d ' ' -f2)
 done
+
 ```
+This script checks the presence of `.ko` modules and `.xz` modules and copies them accordingly. It also lists the copied modules in a file named `module_list.txt`.  
 The variable `module_source_path` can refer to a custom location, just above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
 > "/lib/modules/5.4"  
 > "/lib/modules/5.11"  
