@@ -148,7 +148,6 @@ for mod in ${mods[@]}; do
     
   done < <(modprobe --show-depends $mod | cut -d ' ' -f2)
 done
-
 ```
 This script checks the presence of `.ko` modules and `.ko.xz` modules and copies them accordingly. It also lists the copied modules in a file named `module_list.txt`.  
 The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko.xz</pre>  
