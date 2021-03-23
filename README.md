@@ -164,8 +164,10 @@ args=$(cat /proc/cmdline)
 
 # do your thing here, finally mount the boot location to /mnt/root
 
-arg_part=$(echo $args | awk '{print $1}')
-arg_path=$(echo $args | awk '{print $2}')
+# first argument value is "(loop)/boot/vmlinuz-linux" we don't need that.
+# Our arguments start from second token.
+arg_part=$(echo $args | awk '{print $2}')
+arg_path=$(echo $args | awk '{print $3}')
 
 img_part=$(echo $arg_part | cut -d '=' -f2)
 img_path=$(echo $arg_path | cut -d '=' -f2)
