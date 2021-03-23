@@ -186,6 +186,13 @@ In the above scenario, some more modifications are to be done before booting.
 1. The img file needs to be mounted as read-write and the `etc/fstab` entries need to be changed. UUID of the / partition must be same as the UUID of the actual img file. This can be found by the command `blkid <path_to_arch.img_file>`  
 2. Also in most cases, the modules from the current distro will not work on this `arch.img` file. The img file needs to be mounted, and in the [AUTOMATION section of "Gathering modprobe modules"](#automation-2), the variable `module_source_path` needs to point to the modules of this img mount point (say "/run/media/$USER/arch_root/lib/modules/5.9.6/")
 
+## Make the `init` file executable
+This is very important and is often missed. Hence added under a seperate heading.
+```
+cd ~/src_custom_initramfs
+chmod +x init
+```
+
 ## Compile the initramfs
 The compiled output should not reside inside the initramfs directory.
 ```
