@@ -158,14 +158,14 @@ cd ~/src_custom_initramfs
 vim module_list.txt
 ```
 Contents of the file will be something like:
-> /lib/modules/generic/kernel/fs/jbd2/jbd2.ko.xz
-> /lib/modules/generic/kernel/fs/mbcache.ko.xz
-> /lib/modules/generic/kernel/lib/crc16.ko.xz
-> /lib/modules/generic/kernel/arch/x86/crypto/crc32c-intel.ko.xz
-> /lib/modules/generic/kernel/crypto/crc32c_generic.ko.xz
-> /lib/modules/generic/kernel/fs/ext4/ext4.ko.xz
-> /lib/modules/generic/kernel/fs/ntfs/ntfs.ko.xz
-> /lib/modules/generic/kernel/drivers/block/loop.ko.xz
+> /lib/modules/generic/kernel/fs/jbd2/jbd2.ko.xz  
+> /lib/modules/generic/kernel/fs/mbcache.ko.xz  
+> /lib/modules/generic/kernel/lib/crc16.ko.xz  
+> /lib/modules/generic/kernel/arch/x86/crypto/crc32c-intel.ko.xz  
+> /lib/modules/generic/kernel/crypto/crc32c_generic.ko.xz  
+> /lib/modules/generic/kernel/fs/ext4/ext4.ko.xz  
+> /lib/modules/generic/kernel/fs/ntfs/ntfs.ko.xz  
+> /lib/modules/generic/kernel/drivers/block/loop.ko.xz  
 
 
 ## Finally create the init script
