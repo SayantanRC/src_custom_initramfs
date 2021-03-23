@@ -259,6 +259,7 @@ chmod +x init
 ## Compile the initramfs
 The compiled output should not reside inside the initramfs directory.
 ```
+cd ~/src_custom_initramfs
 find . | cpio -H newc -o > ../my_initramfs.cpio
 cat ../my_initramfs.cpio | gzip > ../my_initramfs.igz
 ```
