@@ -1,6 +1,11 @@
 ## Setup directories
-Clone this repository in the home directory and move to [Gathering binaries](#gathering-binaries). Or follow the below steps to manually setup the directory structure.  
-To manually create the directories: Use the below commands.  
+Clone this repository in the home directory 
+```
+cd ~
+https://github.com/SayantanRC/src_custom_initramfs.git
+```
+and move to [Gathering binaries](#gathering-binaries). Or follow the below steps to manually setup the directory structure.  
+#### To manually create the directories, use the below commands.  
 ```
 mkdir ~/src_custom_initramfs
 mkdir -p ~/src_custom_initramfs/{dev,etc,mnt/root,proc,root,sbin,secure,sys,tmp,usr/bin,usr/lib,usr/lib64}
