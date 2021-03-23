@@ -20,7 +20,7 @@ ln -s usr/lib64 .
 
 ## Gathering binaries
 The following binaries are recommended to be added. More (or less) binaries may be added as per requirement.  
-`bash, mkdir, ls, cat, tail, grep, cut, awk, mount, umount, insmod, lsmod, modprobe, switch_root`  
+`bash, mkdir, ls, cat, tail, grep, cut, awk, mount, umount, insmod, lsmod, modprobe, switch_root, blkid, ntfsfix`  
 To find the location of the binary, in terminal, type `type <binary-name>` or `which <binary-name>`. Example: `which modprobe` gives output `/usr/bin/modprobe`  
 We need to copy each of them in the respective directories. In the above example of modprobe, the command would be `cp -p /usr/bin/modprobe usr/bin/modprobe`.  
 ### AUTOMATION!
@@ -31,7 +31,7 @@ while read -r bin_path
 do
   init_bin_path=${bin_path:1}
   cp -pv $bin_path $init_bin_path
-done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root})
+done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
 ```
 
 ## Gathering library dependencies
@@ -63,7 +63,7 @@ do
     init_lib_path=${lib_path:1}
     cp -npv $lib_path $init_lib_path
   done < <(ldd $bin_path | tail -n +2)
-done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root})
+done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
 ```
 The -n flag in `cp`: no-clobber - do NOT overwrite an existing file.
 
@@ -172,9 +172,22 @@ arg_path=$(echo $args | awk '{print $3}')
 img_part=$(echo $arg_part | cut -d '=' -f2)
 img_path=$(echo $arg_path | cut -d '=' -f2)
 
+echo "Partition: $img_part"
+echo "IMG path: $img_path"
+
+# check if ntfs partition, if yes, use ntfsfix
+part_type="$(blkid $img_part | awk -F 'TYPE' '{print $2}' | awk -F '[ ="]' '{print $3}')"
+printf "\nPartition type (blkid): $part_type\n\n"
+if [[ "$part_type" == "ntfs" ]]; then
+  printf "Checking and fixing NTFS...\n\n"
+  ntfsfix -d $img_part
+fi
+
+echo "Mounting partition..."
 mkdir /img_partition
 mount -o rw $img_part /img_partition
 
+echo "Mounting IMG as loop..."
 mount -o rw,loop,sync /img_partition/$img_path /mnt/root
 
 
@@ -185,6 +198,7 @@ umount /proc
 umount /sys
 
 # Boot
+printf "\nBooting..."
 exec switch_root /mnt/root /sbin/init
 ```
 
