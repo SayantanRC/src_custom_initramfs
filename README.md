@@ -87,7 +87,7 @@ Module files and their dependencies can be seen via the command `modprobe --show
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/crypto/crc32c_generic.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/ext4/ext4.ko.xz  
 
-If we want to make an initramfs for this kernel, we can go ahead and copy these files. Syntax will be something like `mkdir -p lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2; cp -pv lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2 lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2` for each of the modules.  
+If we want to make an initramfs for this kernel, we can go ahead and copy these files. Syntax will be something like `mkdir -p lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2; cp -pv /lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz` for each of the modules.  
 If however, we need to get the modules for a different kernel, we will need to copy from that kernel modules (various cases arise here like copying from an OS on a USB, copying from a backup img file etc).  
 ### AUTOMATION!
 ```
@@ -137,7 +137,7 @@ for mod in ${mods[@]}; do
 done
 
 ```
-This script checks the presence of `.ko` modules and `.xz` modules and copies them accordingly. It also lists the copied modules in a file named `module_list.txt`.  
+This script checks the presence of `.ko` modules and `.ko.xz` modules and copies them accordingly. It also lists the copied modules in a file named `module_list.txt`.  
 The variable `module_source_path` can refer to a custom location, just above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
 > "/lib/modules/5.4"  
 > "/lib/modules/5.11"  
