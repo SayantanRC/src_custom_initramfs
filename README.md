@@ -21,7 +21,7 @@ ln -s usr/lib64 .
 
 ## Gathering binaries
 The following binaries are recommended to be added. More (or less) binaries may be added as per requirement.  
-`bash, mkdir, ls, cat, tail, grep, cut, awk, mount, umount, insmod, lsmod, modprobe, switch_root, blkid, ntfsfix`  
+`bash, mkdir, ls, cat, tail, grep, cut, awk, ntfs-3g, mount, umount, insmod, lsmod, modprobe, switch_root, blkid, ntfsfix`  
 To find the location of the binary, in terminal, type `type <binary-name>` or `which <binary-name>`. Example: `which modprobe` gives output `/usr/bin/modprobe`  
 We need to copy each of them in the respective directories. In the above example of modprobe, the command would be `cp -p /usr/bin/modprobe usr/bin/modprobe`.  
 ### AUTOMATION!
@@ -32,7 +32,7 @@ while read -r bin_path
 do
   init_bin_path=${bin_path:1}
   cp -pv $bin_path $init_bin_path
-done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
+done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,ntfs-3g,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
 ```
 
 ## Gathering library dependencies
@@ -64,7 +64,7 @@ do
     init_lib_path=${lib_path:1}
     cp -npv $lib_path $init_lib_path
   done < <(ldd $bin_path | tail -n +2)
-done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
+done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,ntfs-3g,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
 ```
 The -n flag in `cp`: no-clobber - do NOT overwrite an existing file.
 
@@ -78,7 +78,7 @@ sudo chroot . usr/bin/bash
 
 ## Gathering modprobe modules
 We will add the following modprobe modules along with their dependencies.  
-`ext4, ntfs, loop`  
+`ext4, fuse, loop`  
 Module files and their dependencies can be seen via the command `modprobe --show-depends <module-name>`. For example, `modprobe --show-depends ext4` gives result:
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/mbcache.ko.xz  
@@ -111,7 +111,7 @@ cd ~/src_custom_initramfs
 
 init_mod_dir_name="generic"
 
-mods=(ext4 ntfs loop)
+mods=(ext4 fuse loop)
 mod_list_file="module_list.txt"
 
 cat /dev/null > $mod_list_file
@@ -168,7 +168,7 @@ Contents of the file will be something like:
 > /lib/modules/generic/kernel/arch/x86/crypto/crc32c-intel.ko.xz  
 > /lib/modules/generic/kernel/crypto/crc32c_generic.ko.xz  
 > /lib/modules/generic/kernel/fs/ext4/ext4.ko.xz  
-> /lib/modules/generic/kernel/fs/ntfs/ntfs.ko.xz  
+> /lib/modules/generic/kernel/fs/fuse/fuse.ko.xz  
 > /lib/modules/generic/kernel/drivers/block/loop.ko.xz  
 
 
