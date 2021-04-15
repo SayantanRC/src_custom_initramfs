@@ -78,7 +78,7 @@ sudo chroot . usr/bin/bash
 
 ## Gathering modprobe modules
 We will add the following modprobe modules along with their dependencies.  
-`ext4, fuse, loop`  
+`ext4, fuse, loop, ahci, libahci`  
 Module files and their dependencies can be seen via the command `modprobe --show-depends <module-name>`. For example, `modprobe --show-depends ext4` gives result:
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/mbcache.ko.xz  
@@ -86,6 +86,12 @@ Module files and their dependencies can be seen via the command `modprobe --show
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/arch/x86/crypto/crc32c-intel.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/crypto/crc32c_generic.ko.xz  
 > insmod /lib/modules/5.11.6-1-MANJARO/kernel/fs/ext4/ext4.ko.xz  
+
+Note that some modules like `ahci` and `libahci` may be internal modules and not available in the current kernel. These modules are related to disk drives (SATA drives). They are located at:
+```
+/lib/modules/<kernel_version>/kernel/drivers/ata/libahci.ko
+/lib/modules/<kernel_version>/kernel/drivers/ata/ahci.ko
+```
 
 If we want to make an initramfs for this kernel, we can go ahead and copy these files. Syntax will be something like `mkdir -p lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2; cp -pv /lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz` for each of the modules.  
 If however, we need to get the modules for a different kernel, we will need to copy from that kernel modules (various cases arise here like copying from an OS on a USB, copying from a backup img file etc).  
@@ -111,7 +117,7 @@ cd ~/src_custom_initramfs
 
 init_mod_dir_name="generic"
 
-mods=(ext4 fuse loop)
+mods=(ext4 fuse loop ahci libahci)
 mod_list_file="module_list.txt"
 
 cat /dev/null > $mod_list_file
