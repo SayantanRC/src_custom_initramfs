@@ -1,0 +1,17 @@
+bash
+mkdir
+ls
+cat
+tail
+grep
+cut
+awk
+ntfs-3g
+mount
+umount
+insmod
+modprobe
+lsmod
+switch_root
+blkid
+ntfsfix
