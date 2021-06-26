@@ -1,0 +1,70 @@
+#!/usr/bin/bash
+
+mount -t devtmpfs  devtmpfs  /dev
+mount -t proc      proc      /proc
+mount -t sysfs     sysfs     /sys
+mount -t tmpfs     tmpfs     /tmp
+
+# insert modules
+while read -r mod_path
+do
+  insmod $mod_path
+done < module_list.txt
+
+
+# commandline arguments
+args=$(cat /proc/cmdline)
+
+# do your thing here, finally mount the boot location to /mnt/root
+
+# first argument value is "(loop)/boot/vmlinuz-linux" we don't need that.
+# Our arguments start from second token.
+arg_part=$(echo $args | awk '{print $2}')
+arg_path=$(echo $args | awk '{print $3}')
+
+img_part=$(echo $arg_part | cut -d '=' -f2)
+img_path=$(echo $arg_path | cut -d '=' -f2)
+
+echo ""
+echo "Partition: $img_part"
+echo "IMG path: $img_path"
+
+echo ""
+echo "All devices:"
+ls /dev
+
+echo ""
+echo "Kernel version:"
+uname -a
+
+# check if ntfs partition, if yes, use ntfsfix
+part_type="$(blkid $img_part | awk -F 'TYPE' '{print $2}' | awk -F '[ ="]' '{print $3}')"
+printf "\nPartition type (blkid): $part_type\n\n"
+if [[ "$part_type" == "ntfs" ]]; then
+  printf "Checking and fixing NTFS...\n\n"
+  ntfsfix -d $img_part
+  echo ""
+fi
+
+echo "Mounting partition..."
+mkdir /img_partition
+if [[ "$part_type" == "ntfs" ]]; then
+  echo "Mounting with ntfs-3g..."
+  ntfs-3g $img_part /img_partition
+else
+  mount -o rw $img_part /img_partition
+fi
+
+echo "Mounting IMG as loop..."
+mount -o rw,loop,sync /img_partition/$img_path /mnt/root
+
+
+
+
+# clean up
+umount /proc
+umount /sys
+
+# Boot
+printf "\nBooting...\n\n"
+exec switch_root /mnt/root /sbin/init
