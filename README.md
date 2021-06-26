@@ -228,6 +228,14 @@ echo ""
 echo "Partition: $img_part"
 echo "IMG path: $img_path"
 
+echo ""
+echo "All devices:"
+ls /dev
+
+echo ""
+echo "Kernel version:"
+uname -a
+
 # check if ntfs partition, if yes, use ntfsfix
 part_type="$(blkid $img_part | awk -F 'TYPE' '{print $2}' | awk -F '[ ="]' '{print $3}')"
 printf "\nPartition type (blkid): $part_type\n\n"
