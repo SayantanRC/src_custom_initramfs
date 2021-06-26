@@ -26,13 +26,8 @@ To find the location of the binary, in terminal, type `type <binary-name>` or `w
 We need to copy each of them in the respective directories. In the above example of modprobe, the command would be `cp -p /usr/bin/modprobe usr/bin/modprobe`.  
 ### AUTOMATION!
 ```
-cd ~/src_custom_initramfs
-
-while read -r bin_path
-do
-  init_bin_path=${bin_path:1}
-  cp -pv $bin_path $init_bin_path
-done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,ntfs-3g,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
+cd ~/src_custom_initramfs  
+./1.gather_binaries.sh  
 ```
 
 ## Gathering library dependencies
@@ -54,19 +49,9 @@ All these dependencies are to be added individually for all the binaries. Exampl
 <b>IMPORTANT:</b> The first library `linux-vdso.so.1` is provided by the kernel and is not needed to be copied.
 ### AUTOMATION!
 ```
-cd ~/src_custom_initramfs
-
-while read -r bin_path
-do
-  while read -r dependency
-  do
-    lib_path=$(echo $dependency | cut -d ' ' -f3)
-    init_lib_path=${lib_path:1}
-    cp -npv $lib_path $init_lib_path
-  done < <(ldd $bin_path | tail -n +2)
-done < <(which {bash,mkdir,ls,cat,tail,grep,cut,awk,ntfs-3g,mount,umount,insmod,modprobe,lsmod,switch_root,blkid,ntfsfix})
+cd ~/src_custom_initramfs  
+./2.gather_libraries.sh  
 ```
-The -n flag in `cp`: no-clobber - do NOT overwrite an existing file.
 
 ## Check if `chroot` works
 At this point we should be able to chroot into our initramfs directory.
@@ -96,9 +81,9 @@ Note that some modules like `ahci` and `libahci` may be internal modules and not
 If we want to make an initramfs for this kernel, we can go ahead and copy these files. Syntax will be something like `mkdir -p lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2; cp -pv /lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz lib/modules/5.11.6-1-MANJARO/kernel/fs/jbd2/jbd2.ko.xz` for each of the modules.  
 If however, we need to get the modules for a different kernel, we will need to copy from that kernel modules (various cases arise here like copying from an OS on a USB, copying from a backup img file etc).  
 ### AUTOMATION!
-```
-module_source_path="/lib/modules/`uname -r`"
-```
+
+##### Find path for variable `module_source_path`
+
 <b>The path specified by this variable must exist.</b>  
 The variable `module_source_path` can refer to a custom location, ending with a kernel release, just one level above the 'kernel' directory. Example, a system can have 2 linux kernels installed, say 5.11 and 5.4. Then the `module_source_path` can be any of the following:
 > "/lib/modules/5.4"  
@@ -113,50 +98,12 @@ The value must end with a kernel-release similar to ouput of `uname -r`. It cann
 
 etc.  
 ```
-cd ~/src_custom_initramfs
-
-init_mod_dir_name="generic"
-
-mods=(ext4 fuse loop ahci libahci)
-mod_list_file="module_list.txt"
-
-cat /dev/null > $mod_list_file
-
-for mod in ${mods[@]}; do
-  while read -r actual_mod_path
-  do
-  
-    after_kernel_path=$(echo $actual_mod_path | cut -d '/' -f5-)
-    after_kernel_dir=$(echo ${after_kernel_path%/*})
-    
-    actual_mod_file=$(echo ${after_kernel_path##*/})
-    actual_mod_name=$(echo ${actual_mod_file%%.*})
-    
-    init_mod_dir="lib/modules/$init_mod_dir_name/$after_kernel_dir"
-    
-    mkdir -p $init_mod_dir
-    
-    ko_path="${module_source_path}/${after_kernel_dir}/${actual_mod_name}.ko"
-    xz_path="${module_source_path}/${after_kernel_dir}/${actual_mod_name}.ko.xz"
-    
-    init_mod_path=""
-    if [[ -e "$ko_path" ]]; then
-      init_mod_path="${init_mod_dir}/${actual_mod_name}.ko"
-      cp -npv $ko_path $init_mod_path
-    elif [[ -e "$xz_path" ]]; then
-      init_mod_path="${init_mod_dir}/${actual_mod_name}.ko.xz"
-      cp -np $xz_path $init_mod_path && echo "Copied: $actual_mod_name" || echo "FAILED: $actual_mod_name"
-    else
-      echo "Module $actual_mod_name not found in source path"
-    fi
-    
-    if [[ -n "$init_mod_path" ]]; then
-      echo "/${init_mod_path}" >> $mod_list_file
-    fi
-    
-  done < <(modprobe --show-depends $mod | cut -d ' ' -f2)
-done
+cd ~/src_custom_initramfs  
+./3.gather_mods.sh  
 ```
+Enter the path you found out previously.  
+
+##### Some explanation of the script
 This script checks the presence of `.ko` modules and `.ko.xz` modules and copies them accordingly. It also lists the copied modules in a file named `module_list.txt`.  
 The variable `init_mod_dir_name` can be set as any string like "IceCream", "MyInit" anything; but in the final `init` script, `insmod` will need to refer to the proper file paths. Example, if the value is set as "MojoJojo", in `init` script, insmod will need to be used as: <pre>insmod /lib/modules/<b>MojoJojo</b>/kernel/fs/ext4/ext4.ko.xz</pre>  
 If we are using the `init` file from this repository as a template, along with `module_list.txt` (check the next section), then we do not need to worry about inserting the modules as it will be done for automatically.  
@@ -285,7 +232,7 @@ chmod +x init
 The compiled output should not reside inside the initramfs directory.
 ```
 cd ~/src_custom_initramfs
-find . | cpio -H newc -o > ../my_initramfs.cpio
-cat ../my_initramfs.cpio | gzip > ../my_initramfs.igz
+./4.compile.sh
 ```
+A new `my_initramfs.igz` file is created one directory level above. In this case, directly under home.  
 Now this `my_initramfs.igz` file can be placed in the target device's boot directory and called from `initrd` of Grub.
